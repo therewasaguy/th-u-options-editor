@@ -78,6 +78,9 @@ A Thelma component providing solution to no problem in particular.
             case "boolean":
               self.addToggleButton(attr, self.options[attr]);
               break;
+            case "float":
+              self.addCoreInput(attr, self.options[attr]);
+              break;
             case "range":
               break;
             case "color":
@@ -90,14 +93,20 @@ A Thelma component providing solution to no problem in particular.
           }
         }
       },
+      getOptionContainer: function(id){
+        var self = this, 
+        optionContainer = self.shadowRoot.querySelector('#'+id);
+        optionContainer.innerHTML = "";
+        
+        return optionContainer;
+      },
       addToggleButton: function(attr, options){
         var self = this,
             directory = "../paper-toggle-button/paper-toggle-button.html",
             pathToEl = this.resolvePath(directory); // construct path to component
         
         // Select the container and empty it
-        var optionContainer = self.shadowRoot.querySelector('#'+attr);
-        optionContainer.innerHTML = "";
+        var optionContainer = self.getOptionContainer(attr);
 
         // Create a label and control for the attr and append to container
         Polymer.import([pathToEl],function(){
@@ -119,10 +128,48 @@ A Thelma component providing solution to no problem in particular.
 
       },
       addCoreInput: function(attr, options){
+        var self = this,
+            directory = "../core-input/core-input.html",
+            pathToEl = this.resolvePath(directory); // construct path to component
+        
+        // Select the container and empty it
+        var optionContainer = self.getOptionContainer(attr);
+
+        // Create a label and control for the attr and append to container
+        Polymer.import([pathToEl],function(){
+          var label = document.createElement('label');
+              label.innerHTML = options.friendly;
+          
+          var el = document.createElement('input');
+              el["is"] = "core-input"; // does not work -- just a regular input
+              el.value = options["default"];
+
+              el.addEventListener('change', function(e, detail, selection){
+                var inputValue = self.parseInput(el.value, options.type);
+                self.updateSelection(attr, inputValue);
+                
+              })
+          optionContainer.appendChild(label);
+          optionContainer.appendChild(el);
+          
+        })
 
       },
       addCustom: function(){
 
+      },
+      parseInput: function(value, type){
+        switch(type){
+          case "float":
+            return parseFloat(value);
+            break;
+          case "int":
+            return parseInt(value);
+            break;
+          default: 
+            return value;
+            break;
+        }
       },
       updateSelection: function(attr, value){
         var self = this;
@@ -130,7 +177,7 @@ A Thelma component providing solution to no problem in particular.
         self.fire('th-options-changed'); // Fire event because observer does not recognized changes without object
       },
       selectionsChanged: function(){
-        console.log(this.selections);
+        // console.log(this.selections);
       }
 
     });
