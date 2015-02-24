@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "keywords": "thelma, polymer, web-components",
   "main": "th-u-options-editor.html",
-  "dependencies": {  
+  "dependencies": {
     "th-theme": "thelmanews/th-theme",
-    "polymer": "Polymer/polymer#~0.5.1"
+    "polymer": "Polymer/polymer#~0.5.1",
+    "paper-slider": "Polymer/paper-slider#~0.5.5"
   }
 }
-

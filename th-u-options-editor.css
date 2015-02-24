@@ -25,3 +25,17 @@ paper-toggle-button::shadow [checked] .toggle {
 paper-toggle-button::shadow [checked] .toggle-ink {
   color: #536482;
 }
+
+
+paper-slider::shadow #sliderBar::shadow #activeProgress {
+  background-color: #536482;
+}
+
+paper-slider::shadow #sliderKnobInner {
+  background-color: #536482;
+}
+
+paper-slider::shadow #sliderKnobInner::before {
+  background-color: #536482;
+}
+
