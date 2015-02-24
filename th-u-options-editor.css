@@ -16,6 +16,7 @@
 
 label {
   margin: 10px;
+  vertical-align: top;
 }
 
 paper-toggle-button::shadow [checked] .toggle {
@@ -38,4 +39,40 @@ paper-slider::shadow #sliderKnobInner {
 paper-slider::shadow #sliderKnobInner::before {
   background-color: #536482;
 }
+
+
+.selector {
+  min-height: 10px;
+  max-height: 100px;
+  overflow-y: scroll; 
+  display: inline-block;
+  border: 1px solid #EEE;
+  width: 265px;
+  cursor: pointer;
+}
+core-selector {
+  min-height: 10px;
+  max-height: 100px;
+  overflow-y: scroll; 
+  display: inline-block;
+  border: 1px solid #EEE;
+  cursor: pointer;
+  background-color: white;
+}
+
+core-selector div {
+  padding: 1px;
+  display: block;
+  margin: 0 3px;
+  padding: 1px;
+}
+
+core-selector div:hover {
+  background-color: #eee;
+}
+
+core-selector .core-selected {
+  background-color: #ccc;
+}
+
 

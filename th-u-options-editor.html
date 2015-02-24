@@ -84,6 +84,9 @@ A Thelma component providing solution to no problem in particular.
             case "range":
               self.addSlider(attr, self.options[attr]);
               break;
+            case "dropdown":
+              self.addDropdown(attr, self.options[attr]);
+              break;
             case "color":
               break;
             case "hidden":
@@ -182,12 +185,38 @@ A Thelma component providing solution to no problem in particular.
         })
 
       },
-      addDropdown: function(){
-    //     <core-selector class="selector" selected="{{dateTypeFrom}}"  valueattr="label">
-    //   <template repeat="{{format in dateFormats}}">
-    //     <div class="dateItem" label="{{format.type}}">{{format.type}} <span class="small">(i.e. {{format.example}})</span></div>
-    //   </template>
-    // </core-selector>
+      addDropdown: function(attr, options){
+        var self = this,
+            directory = "../core-selector/core-selector.html",
+            pathToEl = this.resolvePath(directory); // construct path to component
+        
+        // Select the container and empty it
+        var optionContainer = self.getOptionContainer(attr);
+
+        // Create a label and control for the attr and append to container
+        Polymer.import([pathToEl],function(){
+          var label = document.createElement('label');
+              label.innerHTML = options.friendly;
+          
+          var el = document.createElement('core-selector');
+              el.addEventListener('core-select', function(e, detail, selection){
+                var selection = options["values"][el.selected];
+                self.updateSelection(attr, selection); 
+              })
+
+          optionContainer.appendChild(label);
+          optionContainer.appendChild(el);
+
+          var choices = options["values"];
+          for (var i=0; i<choices.length; i++){
+            var choice = document.createElement('div');
+            choice.innerHTML = choices[i];
+            el.appendChild(choice);
+          }
+
+          el.selected = options["values"].indexOf(options["default"]);
+          
+        })
       },
       addCustom: function(){
 
