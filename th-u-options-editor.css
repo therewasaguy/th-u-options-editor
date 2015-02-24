@@ -1,0 +1,27 @@
+:host {
+  display: inline-block;
+  color: black;
+  width: 300px;
+  height: 100%;
+  overflow-y: scroll;
+  z-index: 20;
+  background-color: rgba(255,255,255,0.8);
+}
+
+#options > * {
+  display: block;
+  margin: 10px;
+
+}
+
+label {
+  margin: 10px;
+}
+
+paper-toggle-button::shadow [checked] .toggle {
+  background-color: #536482;
+}
+
+paper-toggle-button::shadow [checked] .toggle-ink {
+  color: #536482;
+}

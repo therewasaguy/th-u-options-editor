@@ -1,0 +1,138 @@
+<link rel="import" href="../polymer/polymer.html"> 
+<link rel="import" href="../th-theme/th-theme.html"> 
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+
+<!--
+A Thelma component providing solution to no problem in particular.
+
+##### Example
+
+    <th-u-options-editor></th-u-options-editor>
+
+@element th-u-options-editor
+@blurb Element providing solution to no problem in particular.
+@status alpha
+@homepage http://nishacodes.github.io/th-u-options-editor
+-->
+
+<polymer-element name="th-u-options-editor" attributes="options selections">
+  <template>
+    <core-style ref="theme"></core-style>
+    <link rel="stylesheet" href="th-u-options-editor.css">
+    <div id="options">
+      <template repeat="{{attr in optionAttrs}}">
+        <div class="option" id="{{attr}}">
+          
+
+        </div>
+      </template>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      // options: {
+      //         "latitude": {"friendly":"Latitude", "type":"int", "default":40.7127},
+      //         "longitude": {"friendly":"Longitude", "type":"int", "default":-74.0059},
+      //         "zoom": {"friendly":"Zoom", "type":"int", "default":10},
+      //         "useTheme": {"friendly":"Use Card Theme", "type":"boolean", "default": true},
+      //         "showCenterMarker": {"friendly":"Show Center Marker", "type":"boolean", "default": false},
+      //         "fitToMarkers": {"friendly":"Fit to Markers", "type":"boolean", "default": false},
+      //         "zoomable": {"friendly":"Zoomable", "type":"boolean", "default": true},
+      //         "mapType": {"friendly":"Map Type", "type": "dropdown", "default": "roadmap", "values":["roadmap", "satellite", "hybrid", "terrain"]},
+      //         "markers":{"friendly":"Markers", "type":"table-repeating","rows":2, 
+      //           "fields":{
+      //             "latitude": {"friendly":"Latitude", "type":"int", "default":40.7127},
+      //             "longitude": {"friendly":"Longitude", "type":"int", "default":-74.0059},
+      //             "label" : {"friendly": "Label", "type": "string", "defualt": "NYC"},
+      //             "image" : {"friendly": "Icon", "type": "image", "defualt": ""}
+      //           },
+      //           "default":[
+      //             {"latitude": 40.71, "longitude": -74.0059, "label": "NYC"  }, 
+      //             {"latitude": 40.75, "longitude": -74.0049, "label": "another"  }
+      //           ]
+
+      //         }
+      //       },
+      selections: {},
+      ready: function () {
+        // this.optionsChanged();
+
+      },
+      optionsChanged: function(){
+        var self = this;
+        self.optionAttrs = Object.keys(self.options);
+
+        var interval = setInterval(function(){
+          var optionsReady = self.$.options.hasChildNodes();
+          if(optionsReady) {
+            clearInterval(interval);
+            self.parseOptions();
+          }
+        }, 100);
+      },
+      parseOptions: function(){
+        var self = this;
+        for (var attr in self.options){
+          
+          switch(self.options[attr].type){
+            case "boolean":
+              self.addToggleButton(attr, self.options[attr]);
+              break;
+            case "range":
+              break;
+            case "color":
+              break;
+            case "hidden":
+              break;
+            default: 
+              self.addCoreInput(attr);
+              break;
+          }
+        }
+      },
+      addToggleButton: function(attr, options){
+        var self = this,
+            directory = "../paper-toggle-button/paper-toggle-button.html",
+            pathToEl = this.resolvePath(directory); // construct path to component
+        
+        // Select the container and empty it
+        var optionContainer = self.shadowRoot.querySelector('#'+attr);
+        optionContainer.innerHTML = "";
+
+        // Create a label and control for the attr and append to container
+        Polymer.import([pathToEl],function(){
+          var label = document.createElement('label');
+              label.innerHTML = options.friendly;
+          
+          var el = document.createElement('paper-toggle-button');
+              el.checked = options["default"];
+              el.addEventListener('change', function(e, detail, selection){
+                self.updateSelection(attr, el.checked);
+                
+              })
+          optionContainer.appendChild(label);
+          optionContainer.appendChild(el);
+          
+        })
+      },
+      addSlider: function(attr, options){
+
+      },
+      addCoreInput: function(attr, options){
+
+      },
+      addCustom: function(){
+
+      },
+      updateSelection: function(attr, value){
+        var self = this;
+        self.selections[attr] = value;
+        self.fire('th-options-changed'); // Fire event because observer does not recognized changes without object
+      },
+      selectionsChanged: function(){
+        console.log(this.selections);
+      }
+
+    });
+  </script>
+</polymer-element>
