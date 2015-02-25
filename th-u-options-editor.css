@@ -18,7 +18,6 @@
 }
 
 #options {
-  padding: 10px;
   box-sizing: border-box;
   -webkit-box-shadow: 5px 0px 10px -2px rgba(171,171,171,0.63);
   -moz-box-shadow: 5px 0px 10px -2px rgba(171,171,171,0.63);
@@ -31,7 +30,7 @@
 
 #options > * {
   display: block;
-  margin: 10px;
+  margin: 15px 10px;
 }
 
 label {
@@ -100,4 +99,9 @@ core-selector .core-selected {
 .closed {
   transition: 1s;
   margin-left: -300px;
+}
+
+input {
+  display: block;
+  width: 95%;
 }
