@@ -37,29 +37,6 @@ A Thelma component providing solution to no problem in particular.
   </div>
   <script>
     Polymer({
-      // options: {
-      //         "latitude": {"friendly":"Latitude", "type":"int", "default":40.7127},
-      //         "longitude": {"friendly":"Longitude", "type":"int", "default":-74.0059},
-      //         "zoom": {"friendly":"Zoom", "type":"int", "default":10},
-      //         "useTheme": {"friendly":"Use Card Theme", "type":"boolean", "default": true},
-      //         "showCenterMarker": {"friendly":"Show Center Marker", "type":"boolean", "default": false},
-      //         "fitToMarkers": {"friendly":"Fit to Markers", "type":"boolean", "default": false},
-      //         "zoomable": {"friendly":"Zoomable", "type":"boolean", "default": true},
-      //         "mapType": {"friendly":"Map Type", "type": "dropdown", "default": "roadmap", "values":["roadmap", "satellite", "hybrid", "terrain"]},
-      //         "markers":{"friendly":"Markers", "type":"table-repeating","rows":2, 
-      //           "fields":{
-      //             "latitude": {"friendly":"Latitude", "type":"int", "default":40.7127},
-      //             "longitude": {"friendly":"Longitude", "type":"int", "default":-74.0059},
-      //             "label" : {"friendly": "Label", "type": "string", "defualt": "NYC"},
-      //             "image" : {"friendly": "Icon", "type": "image", "defualt": ""}
-      //           },
-      //           "default":[
-      //             {"latitude": 40.71, "longitude": -74.0059, "label": "NYC"  }, 
-      //             {"latitude": 40.75, "longitude": -74.0049, "label": "another"  }
-      //           ]
-
-      //         }
-      //       },
       selections: {},
       menuOpened: false,
       ready: function () {
@@ -97,10 +74,17 @@ A Thelma component providing solution to no problem in particular.
             case "range":
               self.addSlider(attr, self.options[attr]);
               break;
+            case "single-select":
+              self.addDropdown(attr, self.options[attr]);
+              break;
             case "dropdown":
               self.addDropdown(attr, self.options[attr]);
               break;
+            case "multi-select":
+              self.addDropdown(attr, self.options[attr]);
+              break;
             case "color":
+              self.addCoreInput(attr, self.options[attr]);
               break;
             case "hidden":
               break;
@@ -217,6 +201,7 @@ A Thelma component providing solution to no problem in particular.
           
           var el = document.createElement('core-selector');
               el["valueattr"]="label";
+              el["multi"] = options.type === "multi-select" ? true : false;
               el.addEventListener('core-select', function(e, detail, selection){
                 var selection = el.selected;
                 self.updateSelection(attr, selection); 
@@ -233,7 +218,7 @@ A Thelma component providing solution to no problem in particular.
             el.appendChild(choice);
           }
 
-          el.selected = self.selections[attr] || options["default"];
+          el.selected = self.selections[attr] && self.selections[attr].length || options["default"] || null;
           
         })
       },

@@ -4,14 +4,13 @@
   top: 0;
   color: black;
   height: 100%;
-  z-index: 20;
+  z-index: 1001;
   overflow: hidden;
 }
 
 .optionsContainer {
   margin-left: 0;
   width: 325px;
-
   height: 100%;
   position: relative;
   transition: 1s;
