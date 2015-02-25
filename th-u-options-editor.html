@@ -80,7 +80,6 @@ A Thelma component providing solution to no problem in particular.
       parseOptions: function(){
         var self = this;
         for (var attr in self.options){
-          
           switch(self.options[attr].type){
             case "boolean":
               self.addToggleButton(attr, self.options[attr]);
@@ -104,8 +103,10 @@ A Thelma component providing solution to no problem in particular.
               break;
             case "hidden":
               break;
+            case "custom":
+              break;
             default: 
-              self.addCoreInput(attr);
+              self.addCoreInput(attr, self.options[attr]);
               break;
           }
         }
@@ -131,7 +132,7 @@ A Thelma component providing solution to no problem in particular.
               label.innerHTML = options.friendly;
           
           var el = document.createElement('paper-toggle-button');
-              el.checked = options["default"];
+              el.checked = typeof(self.selections[attr]) === "boolean" ?  self.selections[attr] : options["default"];
               el.addEventListener('change', function(e, detail, selection){
                 self.updateSelection(attr, el.checked);
                 
@@ -157,7 +158,7 @@ A Thelma component providing solution to no problem in particular.
           var el = document.createElement('paper-slider');
               el.min = options["range"][0];
               el.max = options["range"][1];
-              el.value = options["default"] || options["range"][0];
+              el.value = self.selections[attr] || options["default"] || options["range"][0];
               el.step = options["step"] || 1;
               el.pin = true;
 
@@ -185,7 +186,9 @@ A Thelma component providing solution to no problem in particular.
           
           var el = document.createElement('input');
               el["is"] = "core-input"; // does not work -- just a regular input
-              el.value = options["default"];
+              console.log(attr);
+              console.log(self.selections[attr]);
+              el.value = self.selections[attr] || options["default"];
 
               el.addEventListener('change', function(e, detail, selection){
                 var inputValue = self.parseInput(el.value, options.type);
@@ -212,8 +215,9 @@ A Thelma component providing solution to no problem in particular.
               label.innerHTML = options.friendly;
           
           var el = document.createElement('core-selector');
+              el["valueattr"]="label";
               el.addEventListener('core-select', function(e, detail, selection){
-                var selection = options["values"][el.selected];
+                var selection = el.selected;
                 self.updateSelection(attr, selection); 
               })
 
@@ -223,12 +227,12 @@ A Thelma component providing solution to no problem in particular.
           var choices = options["values"];
           for (var i=0; i<choices.length; i++){
             var choice = document.createElement('div');
+            choice.setAttribute("label", choices[i]);
             choice.innerHTML = choices[i];
             el.appendChild(choice);
           }
 
-          el.selected = self.selections[attr] ? options["values"].indexOf(self.selections[attr]) : options["values"].indexOf(options["default"]);
-          
+          el.selected = self.selections[attr] || options["default"];
           
         })
       },
@@ -251,10 +255,7 @@ A Thelma component providing solution to no problem in particular.
       updateSelection: function(attr, value){
         var self = this;
         self.selections[attr] = value;
-        self.fire('th-options-changed'); // Fire event because observer does not recognized changes without object
-      },
-      selectionsChanged: function(){
-        // console.log(this.selections);
+        self.fire('th-options-changed'); // Fire event because observer does not recognized changes within object
       },
       openMenu: function(){
         var self = this;
@@ -265,7 +266,7 @@ A Thelma component providing solution to no problem in particular.
       closeMenu: function(){
         var self = this;
         self.menuOpened = false;
-self.$.optionsContainer.classList.add('closed');
+        self.$.optionsContainer.classList.add('closed');
       },
       displayFilter: function(options){
         if (options && Object.keys(options).length){
@@ -274,7 +275,6 @@ self.$.optionsContainer.classList.add('closed');
           return "none";
         }
       }
-      // TODO: selections need to be saved and the default overridden but current value;
     });
   </script>
 </polymer-element>
