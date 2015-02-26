@@ -46,52 +46,75 @@ A Thelma component providing solution to no problem in particular.
       optionsChanged: function(){
         var self = this;
         self.optionAttrs = Object.keys(self.options);
+// OPTION ATTRS NEEDS TO ACCOUNT FOR NESTED OPTIONS
 
         var interval = setInterval(function(){
           var optionsReady = self.$.options.hasChildNodes();
           if(optionsReady) {
             clearInterval(interval);
-            self.parseOptions();
+            self.parseOptions(self.options);
           }
         }, 100);
       },
-      parseOptions: function(){
+      parseOptions: function(options, parentAttr){
         var self = this;
-        for (var attr in self.options){
-          switch(self.options[attr].type){
+        for (var attr in options){
+          switch(options[attr].type){
             case "boolean":
-              self.addToggleButton(attr, self.options[attr]);
+              self.addToggleButton(options[attr], attr, parentAttr);
               break;
             case "float":
-              self.addCoreInput(attr, self.options[attr]);
+              self.addCoreInput(options[attr], attr, parentAttr;
               break;
             case "int":
-              self.addCoreInput(attr, self.options[attr]);
+              self.addCoreInput(options[attr], attr, parentAttr);
               break;
             case "string":
-              self.addCoreInput(attr, self.options[attr]);
+              self.addCoreInput(options[attr], attr, parentAttr);
               break;
             case "range":
-              self.addSlider(attr, self.options[attr]);
+              self.addSlider(options[attr], attr, parentAttr);
               break;
             case "single-select":
-              self.addDropdown(attr, self.options[attr]);
+              self.addDropdown(options[attr], attr, parentAttr);
               break;
             case "dropdown":
-              self.addDropdown(attr, self.options[attr]);
+              self.addDropdown(options[attr], attr, parentAttr);
               break;
             case "multi-select":
-              self.addDropdown(attr, self.options[attr]);
+              self.addDropdown(options[attr], attr, parentAttr);
               break;
             case "color":
-              self.addCoreInput(attr, self.options[attr]);
+              self.addCoreInput(options[attr], attr, parentAttr);
               break;
             case "hidden":
               break;
             case "custom":
               break;
+            case "object":
+              // Replace object attr name with nested attrs in the optionAttrs array
+              var attrIndex = self.optionAttrs.indexOf(attr);
+              var newAttrs = Object.keys(options[attr].values).toString();
+
+              self.optionAttrs.splice(attrIndex, 1, newAttrs);
+              console.log("***");
+              console.log(self.optionAttrs);
+
+              // Check when new option container divs are ready and parse each attr
+              var interval = setInterval(function(){
+                
+                var optionsReady = self.$.options.querySelectorAll('.option').length === self.optionAttrs.length;
+                self.$.options.querySelectorAll('.option').length
+                console.log(optionsReady)
+                if(optionsReady) {
+                  clearInterval(interval);
+                  self.parseOptions(options[attr].values, attr);
+                }
+              }, 100);
+                
+              break;
             default: 
-              self.addCoreInput(attr, self.options[attr]);
+              self.addCoreInput(attr, self.options[attr], parentAttr);
               break;
           }
         }
@@ -103,11 +126,11 @@ A Thelma component providing solution to no problem in particular.
         
         return optionContainer;
       },
-      addToggleButton: function(attr, options){
+      addToggleButton: function(options, attr, parentAttr){
         var self = this,
             directory = "../paper-toggle-button/paper-toggle-button.html",
             pathToEl = this.resolvePath(directory); // construct path to component
-        
+        console.log(attr);
         // Select the container and empty it
         var optionContainer = self.getOptionContainer(attr);
 
@@ -117,17 +140,31 @@ A Thelma component providing solution to no problem in particular.
               label.innerHTML = options.friendly;
           
           var el = document.createElement('paper-toggle-button');
-              el.checked = typeof(self.selections[attr]) === "boolean" ?  self.selections[attr] : options["default"];
+          if (parentAttr) {
+            self.selections[parentAttr] = {};
+          }
+              el.checked = typeof(self.selections[parentAttr][attr]) === "boolean" ?  self.selections[parentAttr][attr] : options["default"];
+              console.log(el.checked);
               el.addEventListener('change', function(e, detail, selection){
-                self.updateSelection(attr, el.checked);
+                console.log(this.parentNode.id);
+                if (parentAttr){
+                  var nestedAttr = parentAttr + "." + attr;
+                  self.updateSelection(el.checked, nestedAttr);  
+                  // self.selections[parentAttr][attr] = el.checked;
+                  // self.fire('th-options-changed'); // Fire event because observer does not recognized changes within object
+                } else {
+                  self.updateSelection(el.checked, attr);  
+                }
+                
                 
               })
           optionContainer.appendChild(label);
           optionContainer.appendChild(el);
+          console.log(optionContainer)
           
         })
       },
-      addSlider: function(attr, options){
+      addSlider: function(options, attr, parentAttr){
         var self = this,
             directory = "../paper-slider/paper-slider.html",
             pathToEl = this.resolvePath(directory); // construct path to component
@@ -148,7 +185,7 @@ A Thelma component providing solution to no problem in particular.
               el.pin = true;
 
               el.addEventListener('change', function(e, detail, selection){
-                self.updateSelection(attr, el.value);
+                self.updateSelection(el.value, attr);
               })
           optionContainer.appendChild(label);
           optionContainer.appendChild(el);
@@ -156,7 +193,7 @@ A Thelma component providing solution to no problem in particular.
         })
 
       },
-      addCoreInput: function(attr, options){
+      addCoreInput: function(options, attr, parentAttr){
         var self = this,
             directory = "../core-input/core-input.html",
             pathToEl = this.resolvePath(directory); // construct path to component
@@ -171,13 +208,12 @@ A Thelma component providing solution to no problem in particular.
           
           var el = document.createElement('input');
               el["is"] = "core-input"; // does not work -- just a regular input
-              console.log(attr);
-              console.log(self.selections[attr]);
+              
               el.value = self.selections[attr] || options["default"];
 
               el.addEventListener('change', function(e, detail, selection){
                 var inputValue = self.parseInput(el.value, options.type);
-                self.updateSelection(attr, inputValue);
+                self.updateSelection(inputValue, attr);
                 
               })
           optionContainer.appendChild(label);
@@ -186,7 +222,7 @@ A Thelma component providing solution to no problem in particular.
         })
 
       },
-      addDropdown: function(attr, options){
+      addDropdown: function(options, attr, parentAttr){
         var self = this,
             directory = "../core-selector/core-selector.html",
             pathToEl = this.resolvePath(directory); // construct path to component
@@ -204,7 +240,7 @@ A Thelma component providing solution to no problem in particular.
               el["multi"] = options.type === "multi-select" ? true : false;
               el.addEventListener('core-select', function(e, detail, selection){
                 var selection = el.selected;
-                self.updateSelection(attr, selection); 
+                self.updateSelection(selection, attr); 
               })
 
           optionContainer.appendChild(label);
@@ -218,7 +254,7 @@ A Thelma component providing solution to no problem in particular.
             el.appendChild(choice);
           }
 
-          el.selected = self.selections[attr] && self.selections[attr].length || options["default"] || null;
+          el.selected = self.selections[attr] && self.selections[attr].length ?  self.selections[attr] : options["default"] || null;
           
         })
       },
@@ -227,7 +263,7 @@ A Thelma component providing solution to no problem in particular.
       },
       parseInput: function(value, type){
         switch(type){
-          case "float":
+          case "f loat":
             return parseFloat(value);
             break;
           case "int":
@@ -238,9 +274,15 @@ A Thelma component providing solution to no problem in particular.
             break;
         }
       },
-      updateSelection: function(attr, value){
+      updateSelection: function(value, attr, parentAttr){
+        console.log(attr);
         var self = this;
-        self.selections[attr] = value;
+        if (parentAttr){
+          self.selections[parentAttr][attr] = value;  
+        } else {
+          self.selections[attr] = value;
+        }
+        
         self.fire('th-options-changed'); // Fire event because observer does not recognized changes within object
       },
       openMenu: function(){
