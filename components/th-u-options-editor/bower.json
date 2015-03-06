@@ -1,0 +1,15 @@
+{
+  "name": "th-u-options-editor",
+  "version": "0.0.0",
+  "keywords": "thelma, polymer, web-components",
+  "main": "th-u-options-editor.html",
+  "dependencies": {
+    "th-theme": "thelmanews/th-theme",
+    "polymer": "Polymer/polymer#~0.5.1",
+    "paper-toggle-button": "Polymer/paper-toggle-button#~0.5.4",
+    "core-icon": "polymer/core-icon#~0.5.1",
+    "core-selector": "polymer/core-selector#~0.5.1",
+    "paper-slider": "Polymer/paper-slider#~0.5.5",
+    "core-input": "polymer/core-input#~0.5.5"
+  }
+}
